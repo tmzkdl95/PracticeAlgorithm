@@ -1,5 +1,6 @@
 package samsung;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -76,78 +77,109 @@ import java.util.Scanner;
 */
 
 public class jinyungParkTower_9280 {
-	
-	//주차장이 비었는지 확인히는 메서드
-	public static int ck_Ri(int[] R_i,boolean flag) {
-		if()
-		
-		return flag;
+	static boolean flag; //주차공간이 비었는지 여부를 확인하는 flag
+	//주차장이 빈 위치 확인히는 메서드
+	public static int parkCar(int[] ck_R) {
+		int num = 101;
+		for(int i=0; i<ck_R.length; i++) {
+			if(ck_R[i] == 0) {
+				num = i;
+				flag = true;
+				break;
+			}else {
+				flag = false;
+			}
+		}
+		return num;
 	}
 
 	public static void main(String[] args) {
 		
 		int TC = 0;
-		int n=0;
-		int m=0;
-		int x=0;
-		int count = 0;
-		int[] R_i;
-		int[] W_i;
-		boolean flag = true; //주차공간이 비었는지 여부를 확인하는 flag
-		int[] ck_R;  //주차공간 체크하기 위한 배열
-		
-		Queue<Integer> in_x = new LinkedList<Integer>();
-		Queue<Integer> out_x = new LinkedList<Integer>();
 		Scanner sc = new Scanner(System.in);
 		TC = sc.nextInt(); // TC 입력
-		n = sc.nextInt();  // n 값 입력
-		m = sc.nextInt(); // m 값 입력
-		R_i = new int[n];
-		ck_R = new int[n];
-		W_i = new int[m];
 		
-		// R_i 입력
-		for(int i=0; i<n; i++) {
-			R_i[i] = sc.nextInt();
-		}
-		// W_i 입력
-		for(int i=0; i<m; i++) {
-			W_i[i] = sc.nextInt();
-		}
-		
-		//2m개의 x값 입력
-		for(int i=0; i<2*m; i++) {
-			x = sc.nextInt(); // x값 받기
+		ArrayList<Integer> answer = new ArrayList<Integer>();
+		for(int k=0; k<TC; k++) {
 			
-			if(x>0) {
-				in_x.add(x);
-			}else {
-				out_x.add(Math.abs(x));
+			int n=0;
+			int m=0;
+			int x=0;
+			int value = 0;
+			int count = 0;
+			int parkNum = 0;
+			int[] R_i;
+			int[] W_i;
+			
+			int[] ck_R;  //주차공간 체크하기 위한 배열
+			int[] ck_W;  //주차위치 확인하기 위한 배열
+
+			
+			ArrayList<Integer> in_arr = new ArrayList<Integer>();
+			flag = true; //flag 초기화, 최초 = true 
+			n = sc.nextInt();  // n 값 입력
+			m = sc.nextInt(); // m 값 입력
+			R_i = new int[n];
+			ck_R = new int[n];
+			W_i = new int[m];
+			ck_W = new int[m];
+			
+			// R_i 입력
+			for(int i=0; i<n; i++) {
+				R_i[i] = sc.nextInt();
 			}
-		}
+			// W_i 입력
+			for(int i=0; i<m; i++) {
+				W_i[i] = sc.nextInt();
+			}
+			
+			//2m개의 x값 입력
+			for(int i=0; i<2*m; i++) {
+				x = sc.nextInt(); // x값 받기
+				in_arr.add(x);
+			}
 		
 		//in_x가 null이 될때까지 진행
-		while(!in_x.isEmpty()) {
+		int arrNum=0;
+		while(!in_arr.isEmpty()) {
+			//주차공간 확인
+			parkCar(ck_R);
 			//주차공간 있는경우
 			if(flag) {
-				//번호가 작은곳 빈곳에 주차
-				for(int i=0; i<R_i.length; i++) {
-					if(ck_R[i] == 0) {
-						ck_R[i] = in_x.peek();
-						in_x.poll();
+					//차량 입장
+					if(in_arr.get(arrNum)>0) {
+						//빈자리 확인
+						parkNum = parkCar(ck_R); //주차할 자리 부여
+						//주차
+						ck_R[parkNum] = in_arr.get(arrNum);
+						ck_W[in_arr.get(arrNum)-1] = parkNum;
+						value = W_i[ck_R[parkNum]-1]*R_i[parkNum];
+						count += value;
+						in_arr.remove(arrNum);
+					}else {
+						//주차 빠지기
+						ck_R[ck_W[Math.abs(in_arr.get(arrNum))-1]] = 0;
+						in_arr.remove(arrNum);
+					}
+				
+			}//주차공간이 없는경우
+			else {
+				for(int j=0; j<in_arr.size(); j++) {
+					if(in_arr.get(j)<0) {
+						//주차 빼기
+						ck_R[ck_W[Math.abs(in_arr.get(j))-1]] = 0;
+						in_arr.remove(j);
 						break;
 					}
 				}
 			}
-			//주차공간이 없는 경우
-			else {
-				//in_x에서 out_x.peek값 찾아서 poll
-				
-				out_x.poll();
-				flag = true;
-			}
 		}
-
+			answer.add(count);
+		}
+		
+		for(int i=0; i<answer.size(); i++) {
+			System.out.println("#"+(i+1)+" "+answer.get(i));
+		}
 	}
-
+	
 }
